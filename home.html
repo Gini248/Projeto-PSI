@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinguDevelopment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="shortcut icon" href="assets/img/pdgif.gif" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Moon+Dance&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos para o dropdown de perfil - CORRIGIDOS */
+        .profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            margin-left: 15px;
+        }
+
+        .profile-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            height: 44px;
+            width: 44px;
+        }
+
+        .profile-toggle:hover {
+            border-color: rgb(132, 30, 30);
+            box-shadow: 0 0 10px rgba(132, 30, 30, 0.5);
+        }
+
+        .profile-image {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgb(132, 30, 30);
+            background-color: #1a1a1a;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: rgba(20, 20, 20, 0.98);
+            border: 2px solid rgb(132, 30, 30);
+            border-radius: 8px;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            margin-top: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-dropdown.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(132, 30, 30, 0.3);
+            text-align: center;
+        }
+
+        .profile-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgb(132, 30, 30);
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        .profile-header h4 {
+            color: white;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .profile-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .profile-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-menu li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-menu li:last-child {
+            border-bottom: none;
+        }
+
+        .profile-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .profile-menu a:hover {
+            background: rgba(132, 30, 30, 0.2);
+            color: rgb(178, 24, 24);
+            padding-left: 20px;
+        }
+
+        .profile-menu i {
+            width: 20px;
+            margin-right: 10px;
+            color: rgb(132, 30, 30);
+        }
+
+        .profile-menu .admin-option {
+            border-top: 1px dashed rgba(132, 30, 30, 0.5);
+            background: rgba(132, 30, 30, 0.1);
+        }
+
+        .profile-menu .admin-option a:hover {
+            background: rgba(132, 30, 30, 0.3);
+        }
+
+        .profile-menu .logout-option {
+            color: #ff6b6b;
+        }
+
+        .profile-menu .logout-option:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .profile-menu .logout-option i {
+            color: #ff6b6b;
+        }
+
+        /* Fechar dropdown ao clicar fora */
+        .profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 999;
+            display: none;
+        }
+
+        /* Estilos da navbar para manter alinhamento */
+        #nav-menu {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #nav-menu > li {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        #nav-menu > li > a {
+            display: flex;
+            align-items: center;
+            height: 100%;          
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        #nav-menu > li > a:hover {
+            color: rgb(178, 24, 24);
+        }
+        
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .profile-container {
+                margin-left: 10px;
+            }
+            
+            .profile-toggle {
+                height: 40px;
+                width: 40px;
+            }
+            
+            .profile-image {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .profile-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+            
+            #nav-menu > li > a {
+                padding: 0 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-container {
+                margin-left: 5px;
+            }
+            
+            .profile-toggle {
+                height: 36px;
+                width: 36px;
+                padding: 3px;
+            }
+            
+            .profile-image {
+                width: 28px;
+                height: 28px;
+            }
+            
+            #nav-menu > li > a {
+                padding: 0 8px;
+                font-size: 13px;
+            }
+            
+            #nav-menu > li > a i {
+                margin-right: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="" class="logo">
+                    <img src="assets/img/pdgif.gif" class="pd-gif" alt="PinguDevelopment Logo">
+                    <div class="moon-dance-regular">PinguDevelopment</div>
+                </a>
+                <nav>
+                    <ul id="nav-menu">
+                        <li><a href="assets/html/loja-mlos.php"><i class="fas fa-home"></i> MLO's</a></li>
+                        <li><a href="assets/html/loja-peds.php"><i class="fas fa-child"></i> PED's</a></li>
+                        <li><a href="assets/html/loja-clothes.php"><i class="fas fa-tshirt"></i> Clothes</a></li>
+                        <li id="login-li">
+                            <a href="assets/php/login.php" id="login-link"><i class="fa fa-address-card"></i> Login</a>
+                        </li>
+                        <!-- Container do perfil será inserido aqui pelo JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Principal -->
+    <section class="hero">
+        <div class="container">
+            <h1>Pingu Development</h1>
+            <p>Um mundo inteiro de Scripts, Websites, Ped's, MLO's, Clothes, tudo o que precisas no FiveM e RedM numa só loja</p>
+                <a href="assets/html/loja-mlos.php" class="btn">Ver Produtos</a>
+        </div>
+    </section>
+<div class="cor" style="color: white;">
+    <!-- Produtos em Destaque -->
+    <section class="container">
+        <h2 class="section-title">Serviços em Destaque</h2>
+
+        <div class="products" style="text-decoration: none;">
+            <!-- Produto 1 -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="assets/img/cc.png" alt="Laptop Gamer">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Custom PED</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="product-price">$30,00</div>
+                    <div class="product-actions">
+                        <a href="assets/html/loja-peds.php">
+                        <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Comprar</button></a>
+                        <button class="wishlist"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 2 -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="assets/img/cc2.png" alt="Laptop Gamer">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Custom Clothes</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <div class="product-price">$25,00</div>
+                    <div class="product-actions">
+                        <a href="assets/html/loja-clothes.php">
+                        <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Comprar</button></a>
+                        <button class="wishlist"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 3 -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="assets/img/mlo.png" alt="Laptop Gamer">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">MLO re-texture</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="product-price">R$ 20,00</div>
+                    <div class="product-actions">
+                        <a href="assets/html/loja-mlos.php">
+                        <button class="add-to-cart"><i class="fas fa-cart-plus"></i>Comprar</button></a>
+                        <button class="wishlist"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 4 -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="assets/img/webdev.png">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Website | com Backend</h3>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <div class="product-price">$120,00</div>
+                    <div class="product-actions">
+                        <a href="home.html">
+                        <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Comprar</button></a>
+                        <button class="wishlist"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+    <!-- Seção de Recursos -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature">
+                    <img src="assets/img/pd1.png" class="pd1-icon" alt="Devolução Fácil">           
+                    <h3>PED's</h3>
+                    <p>Fazemos PED's costumizados, custom orders e edição de todo o tipo de PED's</p>
+                </div>
+                <div class="feature">
+                    <img src="assets/img/pd2.png" class="pd2-icon" alt="Devolução Fácil">           
+                    <h3>MLO'S</h3>
+                    <p>Criamos, editamos e corrigimos MLO's, temos todo o tipo de serviço edição de colisions, texturas e optimização</p>
+                </div>
+                <div class="feature">
+                    <img src="assets/img/pd3.png" class="pd3-icon" alt="Devolução Fácil">           
+                    <h3>Roupas Costumizadas</h3>
+                    <p>Oferecemos o serviço de criação de roupas, pack e optimização</p>
+                </div>
+                <div class="feature">
+                    <img src="assets/img/pd4.png" class="pd4-icon" alt="Suporte 24/7">
+                    <h3>Code Development </h3>
+                    <p>Configuramos servidores, se precisarem de programadores para WEB Development, Backend Development e configuração em LUA ou C# podemos ajudar nisso.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 class="moon-dance-regular" style="font-size: 221%;">PinguDevelopment</h3>
+                    <p>A loja que tu e o teu servidor precisam!</p>
+                    <div class="social-links">
+                        <a href="https://www.paypal.com/paypalme/gini248"><i class="fab fa-paypal"></i></a>
+                        <a href="https://discord.gg/qGmqZSyAz3"><i class="fab fa-discord"></i></a>
+                        <a href="youtube.com"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Links</h3>
+                    <ul>
+                        <li><a href="home.html">Home Page</a></li>
+                        <li><a href="assets/html/loja-clothes.php">Roupas</a></li>
+                        <li><a href="assets/html/loja-mlos.php">MLO's</a></li>
+                        <li><a href="assets/html/loja-peds.php">PED's</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categorias</h3>
+                    <ul>
+                        <li><a href="assets/html/loja-clothes.php">PED's</a></li>
+                        <li><a href="assets/html/loja-mlos.php">MLO's</a></li>
+                        <li><a href="assets/html/loja-peds.php">Clothes</a></li>    
+                    </ul>
+                </div>
+                <div class="footer-column newsletter">
+                    <h3>Updates</h3>
+                    <p>Insere o teu email para receberes updates!</p>
+                    <input type="email" placeholder="E-mail">
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 PinguDevelopments. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Verificar se há sessão ativa e criar dropdown
+        function checkLoginStatus() {
+            fetch('assets/php/check_session.php', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                // Primeiro verificar se a resposta é válida
+                if (!response.ok) {
+                    console.error('Resposta não OK:', response.status);
+                    return Promise.reject('Resposta não OK');
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    console.error('Não é JSON:', contentType);
+                    return Promise.reject('Não é JSON');
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dados da sessão recebidos:', data);
+                
+                if (data.loggedIn === true && data.userName) {
+                    console.log('Utilizador logado, esconder botão de login');
+                    
+                    // Remover link de login IMEDIATAMENTE
+                    const loginLi = document.getElementById('login-li');
+                    if (loginLi) {
+                        loginLi.style.display = 'none';
+                        console.log('Botão de login escondido');
+                    }
+                    
+                    // Criar dropdown do perfil
+                    createProfileDropdown(data);
+                } else {
+                    console.log('Utilizador não logado ou dados incompletos:', data);
+                    // Mostrar botão de login se estiver escondido
+                    const loginLi = document.getElementById('login-li');
+                    if (loginLi) {
+                        loginLi.style.display = 'flex';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar sessão:', error);
+                // Em caso de erro, mostrar botão de login
+                const loginLi = document.getElementById('login-li');
+                if (loginLi) {
+                    loginLi.style.display = 'flex';
+                }
+            });
+        }
+
+        // Criar dropdown do perfil
+        function createProfileDropdown(userData) {
+            const navMenu = document.getElementById('nav-menu');
+            if (!navMenu) {
+                console.error('Menu de navegação não encontrado');
+                return;
+            }
+            
+            console.log('Criando dropdown para:', userData.userName, 'isAdmin:', userData.isAdmin);
+            
+            // Remover qualquer perfil existente
+            const existingProfile = document.getElementById('profile-container');
+            if (existingProfile) {
+                existingProfile.remove();
+                console.log('Perfil existente removido');
+            }
+            
+            // Criar container principal
+            const profileContainer = document.createElement('li');
+            profileContainer.id = 'profile-container';
+            profileContainer.className = 'profile-container';
+            
+            // Botão toggle (foto do perfil)
+            const profileToggle = document.createElement('div');
+            profileToggle.className = 'profile-toggle';
+            profileToggle.id = 'profile-toggle';
+            
+            const profileImage = document.createElement('img');
+            profileImage.className = 'profile-image';
+            
+            // Usar avatar do utilizador ou padrão
+            let avatarSrc = 'assets/img/pdgif.gif'; // Avatar padrão
+            
+            if (userData.userPhoto && userData.userPhoto !== '') {
+                avatarSrc = userData.userPhoto;
+            }
+            
+            profileImage.src = avatarSrc;
+            profileImage.alt = userData.userName || 'Utilizador';
+            
+            // Handler para erro na imagem
+            profileImage.onerror = function() {
+                console.log('Erro ao carregar imagem do perfil, usando padrão');
+                this.src = 'assets/img/pdgif.gif';
+                this.onerror = null; // Prevenir loop infinito
+            };
+            
+            profileToggle.appendChild(profileImage);
+            
+            // Dropdown menu
+            const profileDropdown = document.createElement('div');
+            profileDropdown.className = 'profile-dropdown';
+            profileDropdown.id = 'profile-dropdown';
+            
+            // Header do dropdown
+            const profileHeader = document.createElement('div');
+            profileHeader.className = 'profile-header';
+            
+            const headerImage = document.createElement('img');
+            headerImage.src = avatarSrc;
+            headerImage.alt = userData.userName || 'Utilizador';
+            headerImage.onerror = function() {
+                this.src = 'assets/img/pdgif.gif';
+                this.onerror = null;
+            };
+            
+            const userName = document.createElement('h4');
+            userName.textContent = userData.userName || 'Utilizador';
+            
+            const userEmail = document.createElement('p');
+            userEmail.textContent = userData.isAdmin ? 'Conta Administrador' : 'Conta Pingu';
+            userEmail.style.color = userData.isAdmin ? '#ff6b6b' : 'rgba(255, 255, 255, 0.7)';
+            userEmail.style.fontWeight = userData.isAdmin ? 'bold' : 'normal';
+            
+            profileHeader.appendChild(headerImage);
+            profileHeader.appendChild(userName);
+            profileHeader.appendChild(userEmail);
+            
+            // Menu items
+            const profileMenu = document.createElement('ul');
+            profileMenu.className = 'profile-menu';
+            
+            // Opção do perfil
+            const profileItem = document.createElement('li');
+            const profileLink = document.createElement('a');
+       
+            // Opção de configurações
+            const settingsItem = document.createElement('li');
+            const settingsLink = document.createElement('a');
+            settingsLink.href = "assets/php/profile.php";
+            settingsLink.innerHTML = '<i class="fas fa-cog"></i> Configurações';
+            settingsItem.appendChild(settingsLink);
+            
+            // Separador antes da opção admin (sempre adicionado, mas só visível se for admin)
+            const adminDivider = document.createElement('li');
+            adminDivider.style.padding = '5px';
+            adminDivider.style.borderBottom = '1px dashed rgba(132, 30, 30, 0.5)';
+            adminDivider.style.display = userData.isAdmin ? 'block' : 'none';
+            
+            // Opção de admin (se for admin)
+            const adminItem = document.createElement('li');
+            adminItem.className = 'admin-option';
+            adminItem.style.display = userData.isAdmin ? 'block' : 'none';
+            const adminLink = document.createElement('a');
+            adminLink.href = 'assets/php/dash.php';
+            adminLink.innerHTML = '<i class="fas fa-tachometer-alt"></i> Dashboard Admin';
+            adminItem.appendChild(adminLink);
+            
+            // Separador após admin (só se for admin)
+            const afterAdminDivider = document.createElement('li');
+            afterAdminDivider.style.padding = '5px';
+            afterAdminDivider.style.borderBottom = '1px dashed rgba(132, 30, 30, 0.5)';
+            afterAdminDivider.style.display = userData.isAdmin ? 'block' : 'none';
+            
+            // Separador antes do logout
+            const logoutDivider = document.createElement('li');
+            logoutDivider.style.padding = '5px';
+            logoutDivider.style.borderBottom = '1px solid rgba(132, 30, 30, 0.3)';
+            
+            // Opção de logout
+            const logoutItem = document.createElement('li');
+            logoutItem.className = 'logout-option';
+            const logoutLink = document.createElement('a');
+            logoutLink.href = 'assets/php/logout.php';
+            logoutLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutItem.appendChild(logoutLink);
+            
+            // Adicionar itens ao menu na ordem correta
+            profileMenu.appendChild(profileItem);
+            profileMenu.appendChild(settingsItem);
+            profileMenu.appendChild(adminDivider);
+            profileMenu.appendChild(adminItem);
+            profileMenu.appendChild(afterAdminDivider);
+            profileMenu.appendChild(logoutDivider);
+            profileMenu.appendChild(logoutItem);
+            
+            // Adicionar tudo ao dropdown
+            profileDropdown.appendChild(profileHeader);
+            profileDropdown.appendChild(profileMenu);
+            
+            // Adicionar elementos ao container
+            profileContainer.appendChild(profileToggle);
+            profileContainer.appendChild(profileDropdown);
+            
+            // Adicionar ao menu de navegação (como último item)
+            navMenu.appendChild(profileContainer);
+            
+            console.log('Dropdown do perfil criado com sucesso');
+            
+            // Forçar realinhamento da navbar
+            realignNavbar();
+            
+            // Adicionar event listeners para o dropdown
+            addDropdownListeners();
+        }
+
+        // Função para realinhar a navbar
+        function realignNavbar() {
+            const navMenu = document.getElementById('nav-menu');
+            if (!navMenu) {
+                console.error('Menu de navegação não encontrado em realignNavbar');
+                return;
+            }
+            
+            // Garantir que todos os itens tenham a mesma altura
+            const navItems = navMenu.querySelectorAll('li');
+            navItems.forEach(item => {
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.height = '100%';
+            });
+            
+            // Garantir que os links dentro dos itens ocupem toda a altura
+            const navLinks = navMenu.querySelectorAll('li > a');
+            navLinks.forEach(link => {
+                link.style.display = 'flex';
+                link.style.alignItems = 'center';
+                link.style.height = '100%';
+            });
+        }
+
+        // Adicionar event listeners para o dropdown
+        function addDropdownListeners() {
+            const profileToggle = document.getElementById('profile-toggle');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!profileToggle || !profileDropdown) return;
+            
+            // Toggle do dropdown
+            profileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('active');
+                
+                // Adicionar ou remover overlay
+                const existingOverlay = document.getElementById('profile-overlay');
+                if (profileDropdown.classList.contains('active')) {
+                    if (!existingOverlay) {
+                        const overlay = document.createElement('div');
+                        overlay.id = 'profile-overlay';
+                        overlay.className = 'profile-overlay';
+                        document.body.appendChild(overlay);
+                        
+                        overlay.addEventListener('click', function() {
+                            profileDropdown.classList.remove('active');
+                            overlay.remove();
+                        });
+                    }
+                } else {
+                    if (existingOverlay) existingOverlay.remove();
+                }
+            });
+            
+            // Fechar dropdown ao clicar em um item
+            profileDropdown.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    this.classList.remove('active');
+                    const overlay = document.getElementById('profile-overlay');
+                    if (overlay) overlay.remove();
+                }
+            });
+            
+            // Fechar dropdown ao pressionar ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
+                    profileDropdown.classList.remove('active');
+                    const overlay = document.getElementById('profile-overlay');
+                    if (overlay) overlay.remove();
+                }
+            });
+        }
+
+        // Funcionalidade do Carrinho
+        const openCartBtn = document.getElementById('open-cart');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartModal = document.getElementById('cart-modal');
+        const overlay = document.getElementById('overlay');
+
+        if (openCartBtn && cartModal && overlay) {
+            openCartBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                cartModal.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        if (closeCartBtn && cartModal && overlay) {
+            closeCartBtn.addEventListener('click', () => {
+                cartModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        if (overlay && cartModal) {
+            overlay.addEventListener('click', () => {
+                cartModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        // Adicionar produtos ao carrinho
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const cartCount = document.querySelector('.cart-count');
+        let count = 3; // Contador inicial
+
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                count++;
+                
+                if (cartCount) {
+                    cartCount.textContent = count;
+                }
+                
+                // Animação de confirmação
+                button.innerHTML = '<i class="fas fa-check"></i> Adicionado';
+                button.style.backgroundColor = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i> Comprar';
+                    button.style.backgroundColor = '';
+                }, 2000);
+            });
+        });
+
+        // Funcionalidade dos botões de quantidade no carrinho
+        const quantityBtns = document.querySelectorAll('.quantity-btn');
+        quantityBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const quantityElement = btn.parentElement.querySelector('.quantity');
+                if (quantityElement) {
+                    let quantity = parseInt(quantityElement.textContent);
+                    
+                    if (btn.textContent === '+') {
+                        quantity++;
+                    } else if (btn.textContent === '-' && quantity > 1) {
+                        quantity--;
+                    }
+                    
+                    quantityElement.textContent = quantity;
+                    updateCartTotal();
+                }
+            });
+        });
+
+        // Remover itens do carrinho
+        const removeButtons = document.querySelectorAll('.remove-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const cartItem = button.closest('.cart-item');
+                if (cartItem) {
+                    cartItem.remove();
+                    updateCartTotal();
+                    if (count > 0) {
+                        count--;
+                    }
+                    if (cartCount) {
+                        cartCount.textContent = count;
+                    }
+                }
+            });
+        });
+
+        // Atualizar total do carrinho
+        function updateCartTotal() {
+            const cartItems = document.querySelectorAll('.cart-item');
+            let total = 0;
+            
+            cartItems.forEach(item => {
+                const priceElement = item.querySelector('.cart-item-price');
+                const quantityElement = item.querySelector('.quantity');
+                
+                if (priceElement && quantityElement) {
+                    const priceText = priceElement.textContent;
+                    // Extrair número do preço
+                    const priceMatch = priceText.match(/(\d+[\.,]?\d*)/);
+                    if (priceMatch) {
+                        const price = parseFloat(priceMatch[0].replace(',', '.'));
+                        const quantity = parseInt(quantityElement.textContent);
+                        total += price * quantity;
+                    }
+                }
+            });
+            
+            const totalElement = document.querySelector('.cart-total span:last-child');
+            if (totalElement) {
+                totalElement.textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            }
+        }
+
+        // Executar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página carregada, verificando status de login...');
+            
+            // Sistema de login/perfil
+            checkLoginStatus();
+            
+            // Garantir que a navbar esteja alinhada mesmo sem login
+            realignNavbar();
+            
+            // Verificar novamente após 1 segundo (para garantir)
+            setTimeout(() => {
+                console.log('Verificação adicional de login...');
+                checkLoginStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

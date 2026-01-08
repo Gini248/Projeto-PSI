@@ -1,0 +1,232 @@
+<!-- No seu header (em home.html) -->
+<header>
+    <div class="container">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <img src="assets/img/pdgif.gif" class="pd-gif" alt="PinguDevelopment Logo">
+                <div class="moon-dance-regular">PinguDevelopment</div>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="assets/html/loja-mlos.html"><i class="fas fa-home"></i> MLO's</a></li>
+                    <li><a href="assets/html/loja-peds.html"><i class="fas fa-child"></i> PED's</a></li>
+                    <li><a href="assets/html/loja-clothes.html"><i class="fas fa-tshirt"></i> Clothes</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Custom Orders</a></li>
+                    <li>
+                        <a href="#" class="cart-icon" id="open-cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">0</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Área de login/logout dinâmica -->
+                    <li id="auth-area">
+                        <a href="assets/html/login.php" class="login-link" id="login-link">
+                            <i class="fas fa-sign-in-alt"></i> Entrar
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<script>
+// Sistema de verificação de login para páginas HTML
+function checkLoginStatus() {
+    // Tentar verificar via cookie/sessão
+    const hasSession = document.cookie.includes('PHPSESSID') || 
+                      document.cookie.includes('pingu_remember');
+    
+    if (hasSession) {
+        // Se tem cookies de sessão, mostrar perfil
+        showUserProfile();
+    } else {
+        // Mostrar botão de login
+        showLoginButton();
+    }
+}
+
+function showUserProfile() {
+    const authArea = document.getElementById('auth-area');
+    if (!authArea) return;
+    
+    // Obter nome do usuário do cookie se disponível
+    const userName = getCookie('user_name') || 'Usuário';
+    
+    authArea.innerHTML = `
+        <div class="user-dropdown">
+            <a href="#" class="user-profile-link">
+                <img src="assets/img/default-avatar.png" alt="Avatar" class="user-avatar-small">
+                <span>${userName}</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+            <div class="dropdown-content">
+                <a href="assets/html/profile.php"><i class="fas fa-user"></i> Meu Perfil</a>
+                <a href="assets/html/my-orders.php"><i class="fas fa-shopping-bag"></i> Meus Pedidos</a>
+                <a href="assets/html/settings.php"><i class="fas fa-cog"></i> Configurações</a>
+                <div class="dropdown-divider"></div>
+                <a href="assets/php/logout.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </div>
+        </div>
+    `;
+    
+    // Adicionar comportamento dropdown
+    initDropdowns();
+}
+
+function showLoginButton() {
+    const authArea = document.getElementById('auth-area');
+    if (!authArea) return;
+    
+    authArea.innerHTML = `
+        <a href="assets/html/login.php" class="login-link">
+            <i class="fas fa-sign-in-alt"></i> Entrar
+        </a>
+    `;
+}
+
+// Função auxiliar para ler cookies
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// Inicializar dropdowns
+function initDropdowns() {
+    const dropdownToggles = document.querySelectorAll('.user-profile-link');
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdown = this.nextElementSibling;
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.user-dropdown')) {
+            document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                dropdown.style.display = 'none';
+            });
+        }
+    });
+}
+
+// Executar quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    
+    // Corrigir erro da linha 250
+    const openCartBtn = document.getElementById('open-cart');
+    if (openCartBtn) {
+        openCartBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Lógica do carrinho
+            alert('Carrinho abrirá em breve!');
+        });
+    }
+    
+    // Adicionar outros event listeners de forma segura
+    const allButtons = document.querySelectorAll('button, .botao, a[href="#"]');
+    allButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.getAttribute('href') === '#') {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Estilos para o sistema de login no header */
+.user-dropdown {
+    position: relative;
+}
+
+.user-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: rgba(132, 30, 30, 0.1);
+    border-radius: 50px;
+    border: 1px solid rgba(132, 30, 30, 0.3);
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.user-profile-link:hover {
+    background: rgba(132, 30, 30, 0.2);
+    transform: translateY(-2px);
+}
+
+.user-avatar-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgb(132, 30, 30);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: rgba(20, 20, 20, 0.98);
+    border: 1px solid rgb(132, 30, 30);
+    border-radius: 10px;
+    padding: 10px 0;
+    min-width: 200px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.dropdown-content a:hover {
+    background: rgba(132, 30, 30, 0.3);
+    padding-left: 25px;
+}
+
+.dropdown-content i {
+    width: 20px;
+    margin-right: 10px;
+    color: rgb(132, 30, 30);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 10px 0;
+}
+
+.logout-link {
+    color: #ff6b6b !important;
+}
+
+.login-link {
+    background: rgb(132, 30, 30);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.login-link:hover {
+    background: rgb(178, 24, 24);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(132, 30, 30, 0.4);
+}
+</style>
